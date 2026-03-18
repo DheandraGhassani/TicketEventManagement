@@ -24,3 +24,6 @@ Homestead.yaml
 Thumbs.db
 vendor/
 node_modules/
+vendor/
+node_modules/
+.env
