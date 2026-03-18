@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('e_ticketss', function (Blueprint $table) {
+        Schema::create('e_tickets', function (Blueprint $table) {
             $table->id();
             $table->string('ticket_code')->unique();
             $table->text('qr_code_data');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('e_ticketss');
+        Schema::dropIfExists('e_tickets');
     }
 };
