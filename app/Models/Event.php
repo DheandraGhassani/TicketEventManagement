@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
-    protected $fillable = ['title', 'description', 'banner_url', 'venue_name', 'address', 'city', 'start_date', 'status', 'is_featured', 'users_id', 'categories_id'];
+    protected $fillable = ['title', 'slug', 'description', 'banner_url', 'venue_name', 'address', 'city', 'start_date', 'status', 'is_featured', 'users_id', 'categories_id'];
+
+    protected $casts = [
+        'start_date' => 'datetime',
+        'is_featured' => 'boolean',
+    ];
 
     public function user()
     {

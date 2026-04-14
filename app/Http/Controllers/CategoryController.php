@@ -8,10 +8,10 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-
     public function index()
     {
         $categories = Category::latest()->paginate(10);
+
         return view('categories.index', compact('categories'));
     }
 
@@ -23,18 +23,18 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100|unique:categories,name',
+            'name' => 'required|string|max:100|unique:categories,name',
             'description' => 'nullable|string',
-            'icon'        => 'nullable|string|max:255',
-            'is_active'   => 'nullable|boolean',
+            'icon' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         Category::create($validated);
 
         return redirect()->route('categories.index')
-                        ->with('success', '✅ Kategori berhasil dibuat!');
+            ->with('success', 'Kategori berhasil dibuat!');
     }
 
     public function edit(Category $category)
@@ -45,18 +45,18 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100|unique:categories,name,' . $category->id,
+            'name' => 'required|string|max:100|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
-            'icon'        => 'nullable|string|max:255',
-            'is_active'   => 'nullable|boolean',
+            'icon' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
-        
+
         $category->update($validated);
 
         return redirect()->route('categories.index')
-                        ->with('success', '✅ Kategori berhasil diupdate!');
+            ->with('success', 'Kategori berhasil diupdate!');
     }
 
     public function destroy(Category $category)
@@ -64,6 +64,6 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->route('categories.index')
-                        ->with('success', '✅ Kategori berhasil dihapus!');
+            ->with('success', 'Kategori berhasil dihapus!');
     }
 }

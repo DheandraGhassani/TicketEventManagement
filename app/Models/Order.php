@@ -8,6 +8,8 @@ class Order extends Model
 {
     protected $fillable = ['order_number', 'total_amount', 'status', 'expired_at', 'users_id', 'events_id', 'payments_id'];
 
+    protected $casts = ['expired_at' => 'datetime'];
+
     public function user()
     {
         return $this->belongsTo(User::class, 'users_id');

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +13,8 @@ return new class extends Migration
         Schema::create('payments_has_notifications', function (Blueprint $table) {
             $table->foreignId('payments_id')->constrained('payments')->onDelete('cascade');
             $table->foreignId('notifications_id')->constrained('notifications')->onDelete('cascade');
-            $table->primary(['payments_id', 'notifications_id'], 'payment_notification_primary');        });
+            $table->primary(['payments_id', 'notifications_id'], 'payment_notification_primary');
+        });
     }
 
     /**

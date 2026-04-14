@@ -18,15 +18,27 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['name','email','password','role','phone','avatar_url','is_active'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'phone', 'avatar_url', 'is_active'];
 
-    public function events() { return $this->hasMany(Event::class, 'users_id'); }
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'users_id');
+    }
 
-    public function orders() { return $this->hasMany(Order::class); }
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'users_id');
+    }
 
-    public function eTickets() { return $this->hasMany(ETicket::class); }
-    
-    public function waitingLists() { return $this->hasMany(WaitingList::class); }
+    public function eTickets()
+    {
+        return $this->hasMany(ETicket::class, 'users_id');
+    }
+
+    public function waitingLists()
+    {
+        return $this->hasMany(WaitingList::class, 'users_id');
+    }
 
     /**
      * The attributes that should be hidden for serialization.
