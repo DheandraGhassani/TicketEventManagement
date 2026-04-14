@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class RoleMiddleware
 {
@@ -19,11 +19,11 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         // 1. Cek apakah user sudah login
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Silakan login terlebih dahulu!'
+                    'message' => 'Silakan login terlebih dahulu!',
                 ], 401);
             }
 
@@ -43,11 +43,12 @@ class RoleMiddleware
         if ($request->expectsJson() || $request->is('api/*')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akses ditolak! Role Anda tidak diizinkan.'
+                'message' => 'Akses ditolak! Role Anda tidak diizinkan.',
             ], 403);
         }
 
         $roleList = implode(', ', $roles);
+
         return redirect()->route('dashboard')
             ->with('error', "Akses ditolak! Halaman ini hanya untuk role: {$roleList}");
     }
