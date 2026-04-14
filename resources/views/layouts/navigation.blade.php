@@ -19,10 +19,13 @@
                         Events
                     </x-nav-link>
 
-                    @if (in_array(Auth::user()->role, ['admin', 'organizer']))
+                    @if (Auth::user()->role === 'admin')
                         <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                             Kategori
                         </x-nav-link>
+                    @endif
+
+                    @if (in_array(Auth::user()->role, ['admin', 'organizer']))
                         <x-nav-link :href="route('tickets.scan.index')" :active="request()->routeIs('tickets.scan.index')">
                             Scan Tiket
                         </x-nav-link>
@@ -99,10 +102,12 @@
             <x-responsive-nav-link :href="route('events.index')" :active="request()->routeIs('events.*')">
                 Events
             </x-responsive-nav-link>
-            @if (in_array(Auth::user()->role, ['admin', 'organizer']))
+            @if (Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                     Kategori
                 </x-responsive-nav-link>
+            @endif
+            @if (in_array(Auth::user()->role, ['admin', 'organizer']))
                 <x-responsive-nav-link :href="route('tickets.scan.index')" :active="request()->routeIs('tickets.scan.index')">
                     Scan Tiket
                 </x-responsive-nav-link>

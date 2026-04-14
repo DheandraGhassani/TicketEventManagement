@@ -15,7 +15,7 @@
             {{-- Banner & Info Event --}}
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                 @if ($event->banner_url)
-                    <img src="{{ Storage::url($event->banner_url) }}" alt="Banner" class="w-full h-56 object-cover">
+                    <img src="{{ Storage::url($event->banner_url) }}" alt="Banner" class="w-full h-56 object-contain">
                 @endif
                 <div class="p-6">
                     <div class="flex flex-wrap justify-between items-start gap-3 mb-4">
@@ -32,7 +32,7 @@
                                 @else bg-gray-100 text-gray-600 @endif">
                                 {{ ucfirst($event->status) }}
                             </span>
-                            @if (in_array(auth()->user()->role, ['admin', 'organizer']))
+                            @if (auth()->user()->role === 'admin')
                                 <a href="{{ route('events.edit', $event) }}"
                                     class="text-xs bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1 rounded hover:bg-indigo-100">Edit</a>
                             @endif
@@ -66,74 +66,80 @@
             </div>
 
             {{-- ============================================================ --}}
-            {{-- ADMIN / ORGANIZER: Manajemen Jenis Tiket --}}
+            {{-- ADMIN: Manajemen Jenis Tiket (CUD) --}}
+            {{-- ORGANIZER: Lihat Jenis Tiket (read-only) --}}
             {{-- ============================================================ --}}
             @if (in_array(auth()->user()->role, ['admin', 'organizer']))
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6" x-data="{ showForm: false }">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-lg text-gray-800 dark:text-gray-200">Jenis Tiket</h3>
-                        <button @click="showForm = !showForm"
-                            class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
-                            + Tambah Tiket
-                        </button>
+                        @if (auth()->user()->role === 'admin')
+                            <button @click="showForm = !showForm"
+                                class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700">
+                                + Tambah Tiket
+                            </button>
+                        @endif
                     </div>
 
-                    {{-- Form Tambah Jenis Tiket --}}
-                    <div x-show="showForm" x-transition
-                        class="border border-indigo-100 rounded-lg p-4 mb-4 bg-indigo-50 dark:bg-gray-700">
-                        <h4 class="font-medium text-sm text-gray-700 dark:text-gray-200 mb-3">Tambah Jenis Tiket Baru
-                        </h4>
-                        <form action="{{ route('ticket-types.store', $event) }}" method="POST"
-                            class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            @csrf
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Nama
-                                    *</label>
-                                <input type="text" name="name" placeholder="cth. VIP, Regular" required
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Harga
-                                    (Rp) *</label>
-                                <input type="number" name="price" min="0" placeholder="0" required
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Kuota
-                                    *</label>
-                                <input type="number" name="quota" min="1" placeholder="100" required
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label
-                                    class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Deskripsi</label>
-                                <input type="text" name="description" placeholder="Opsional"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Mulai
-                                    Penjualan</label>
-                                <input type="datetime-local" name="sale_start"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Akhir
-                                    Penjualan</label>
-                                <input type="datetime-local" name="sale_end"
-                                    class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
-                            </div>
-                            <div class="sm:col-span-2 flex justify-end gap-2">
-                                <button type="button" @click="showForm = false"
-                                    class="text-sm px-3 py-1.5 border border-gray-300 rounded text-gray-600 hover:bg-gray-50">Batal</button>
-                                <button type="submit"
-                                    class="text-sm px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
+                    {{-- Form Tambah Jenis Tiket — hanya admin --}}
+                    @if (auth()->user()->role === 'admin')
+                        <div x-show="showForm" x-transition
+                            class="border border-indigo-100 rounded-lg p-4 mb-4 bg-indigo-50 dark:bg-gray-700">
+                            <h4 class="font-medium text-sm text-gray-700 dark:text-gray-200 mb-3">Tambah Jenis Tiket Baru
+                            </h4>
+                            <form action="{{ route('ticket-types.store', $event) }}" method="POST"
+                                class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                @csrf
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Nama
+                                        *</label>
+                                    <input type="text" name="name" placeholder="cth. VIP, Regular" required
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Harga
+                                        (Rp) *</label>
+                                    <input type="number" name="price" min="0" placeholder="0" required
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Kuota
+                                        *</label>
+                                    <input type="number" name="quota" min="1" placeholder="100" required
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Deskripsi</label>
+                                    <input type="text" name="description" placeholder="Opsional"
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Mulai
+                                        Penjualan</label>
+                                    <input type="datetime-local" name="sale_start"
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">Akhir
+                                        Penjualan</label>
+                                    <input type="datetime-local" name="sale_end"
+                                        class="w-full border border-gray-300 dark:border-gray-600 rounded px-2.5 py-1.5 text-sm dark:bg-gray-800 dark:text-gray-200">
+                                </div>
+                                <div class="sm:col-span-2 flex justify-end gap-2">
+                                    <button type="button" @click="showForm = false"
+                                        class="text-sm px-3 py-1.5 border border-gray-300 rounded text-gray-600 hover:bg-gray-50">Batal</button>
+                                    <button type="submit"
+                                        class="text-sm px-3 py-1.5 bg-indigo-600 text-white rounded hover:bg-indigo-700">Simpan</button>
+                                </div>
+                            </form>
+                        </div>
+                    @endif
 
                     {{-- Tabel Jenis Tiket --}}
                     @if ($event->ticketTypes->isEmpty())
-                        <p class="text-sm text-gray-400 text-center py-6">Belum ada jenis tiket. Klik "+ Tambah Tiket".
+                        <p class="text-sm text-gray-400 text-center py-6">
+                            Belum ada jenis tiket.{{ auth()->user()->role === 'admin' ? ' Klik "+ Tambah Tiket".' : '' }}
                         </p>
                     @else
                         <div class="overflow-x-auto">
@@ -144,7 +150,9 @@
                                         <th class="pb-2 font-medium">Harga</th>
                                         <th class="pb-2 font-medium">Terjual / Kuota</th>
                                         <th class="pb-2 font-medium">Periode Jual</th>
-                                        <th class="pb-2 font-medium text-right">Aksi</th>
+                                        @if (auth()->user()->role === 'admin')
+                                            <th class="pb-2 font-medium text-right">Aksi</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -167,16 +175,18 @@
                                                     Tidak dibatasi
                                                 @endif
                                             </td>
-                                            <td class="py-2 text-right">
-                                                <a href="{{ route('ticket-types.edit', $tt) }}"
-                                                    class="text-xs text-indigo-600 hover:underline mr-2">Edit</a>
-                                                <form action="{{ route('ticket-types.destroy', $tt) }}" method="POST"
-                                                    class="inline" onsubmit="return confirm('Hapus jenis tiket ini?')">
-                                                    @csrf @method('DELETE')
-                                                    <button type="submit"
-                                                        class="text-xs text-red-600 hover:underline">Hapus</button>
-                                                </form>
-                                            </td>
+                                            @if (auth()->user()->role === 'admin')
+                                                <td class="py-2 text-right">
+                                                    <a href="{{ route('ticket-types.edit', $tt) }}"
+                                                        class="text-xs text-indigo-600 hover:underline mr-2">Edit</a>
+                                                    <form action="{{ route('ticket-types.destroy', $tt) }}" method="POST"
+                                                        class="inline" onsubmit="return confirm('Hapus jenis tiket ini?')">
+                                                        @csrf @method('DELETE')
+                                                        <button type="submit"
+                                                            class="text-xs text-red-600 hover:underline">Hapus</button>
+                                                    </form>
+                                                </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>

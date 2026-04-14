@@ -33,7 +33,7 @@
                         <x-input-label for="banner" :value="'Banner Baru (kosongkan jika tidak diubah)'" />
                         @if ($event->banner_url)
                             <img src="{{ Storage::url($event->banner_url) }}"
-                                class="mt-1 h-24 rounded mb-2 object-cover" alt="Banner saat ini">
+                                class="mt-1 h-24 rounded mb-2 object-contain" alt="Banner saat ini">
                         @endif
                         <input id="banner" type="file" name="banner" accept="image/*"
                             class="mt-1 w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
@@ -99,12 +99,6 @@
                                 @endforeach
                             </select>
                             <x-input-error :messages="$errors->get('status')" class="mt-1" />
-                        </div>
-                        <div class="flex items-center mt-6">
-                            <input type="checkbox" name="is_featured" value="1" id="is_featured"
-                                {{ old('is_featured', $event->is_featured) ? 'checked' : '' }}
-                                class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <x-input-label for="is_featured" :value="'Featured'" class="ml-2" />
                         </div>
                     </div>
 

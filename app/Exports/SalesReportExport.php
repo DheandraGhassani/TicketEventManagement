@@ -4,11 +4,11 @@ namespace App\Exports;
 
 use App\Models\Order;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class SalesReportExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class SalesReportExport implements FromCollection, ShouldAutoSize, WithHeadings, WithMapping
 {
     /**
      * Ambil data dari database
@@ -48,7 +48,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithMapping, Sh
             $order->user->name ?? 'Guest',
             $order->user->email ?? '-',
             $order->event->title ?? 'N/A',
-            'Rp ' . number_format($order->total_amount, 0, ',', '.'),
+            'Rp '.number_format($order->total_amount, 0, ',', '.'),
             strtoupper($order->status),
             $order->created_at->format('d M Y H:i'),
         ];

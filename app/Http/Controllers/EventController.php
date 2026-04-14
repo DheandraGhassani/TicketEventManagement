@@ -27,6 +27,8 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        abort_if(Auth::user()->role !== 'admin', 403);
+
         $validated = $request->validate([
             'title' => 'required|string|max:220',
             'description' => 'nullable',
@@ -37,7 +39,6 @@ class EventController extends Controller
             'start_date' => 'required|date',
             'categories_id' => 'required|exists:categories,id',
             'status' => 'required|in:draft,published,cancelled,completed',
-            'is_featured' => 'boolean',
         ]);
 
         if ($request->hasFile('banner')) {
@@ -68,6 +69,8 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
+        abort_if(Auth::user()->role !== 'admin', 403);
+
         $validated = $request->validate([
             'title' => 'required|string|max:220',
             'description' => 'nullable',
@@ -94,6 +97,8 @@ class EventController extends Controller
 
     public function destroy(Event $event)
     {
+        abort_if(Auth::user()->role !== 'admin', 403);
+
         if ($event->banner_url) {
             Storage::disk('public')->delete($event->banner_url);
         }

@@ -86,7 +86,6 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jl. Pintu Satu Senayan, Gelora, Kec. Tanah Abang, Jakarta Pusat',
             'start_date' => now()->addDays(30),
             'status' => 'published',
-            'is_featured' => true,
             'users_id' => $organizer->id,
             'categories_id' => $catMusic->id,
         ]);
@@ -101,7 +100,6 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jl. Gatot Subroto, Senayan, Jakarta Selatan',
             'start_date' => now()->addDays(15),
             'status' => 'published',
-            'is_featured' => true,
             'users_id' => $organizer->id,
             'categories_id' => $catTech->id,
         ]);
@@ -116,7 +114,6 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jl. HR Rasuna Said, Kuningan, Jakarta Selatan',
             'start_date' => now()->addDays(45),
             'status' => 'draft',
-            'is_featured' => false,
             'users_id' => $organizer->id,
             'categories_id' => $catSport->id,
         ]);
@@ -131,7 +128,6 @@ class DatabaseSeeder extends Seeder
             'address' => 'Jl. Merdeka Barat No. 12, Jakarta Pusat',
             'start_date' => now()->subDays(10),
             'status' => 'completed',
-            'is_featured' => false,
             'users_id' => $organizer->id,
             'categories_id' => $catArt->id,
         ]);
@@ -180,7 +176,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Akses penuh semua sesi',
             'price' => 500000,
             'quota' => 300,
-            'sold_count' => 85,
+            'sold_count' => 300, // habis — trigger waiting list
             'events_id' => $eventTech->id,
         ]);
         $techPremium = TicketType::create([
@@ -188,7 +184,7 @@ class DatabaseSeeder extends Seeder
             'description' => 'Termasuk workshop hands-on + sertifikat',
             'price' => 1200000,
             'quota' => 50,
-            'sold_count' => 20,
+            'sold_count' => 50, // habis — trigger waiting list
             'events_id' => $eventTech->id,
         ]);
 

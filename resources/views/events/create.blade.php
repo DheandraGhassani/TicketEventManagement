@@ -96,12 +96,6 @@
                             </select>
                             <x-input-error :messages="$errors->get('status')" class="mt-1" />
                         </div>
-                        <div class="flex items-center mt-6">
-                            <input type="checkbox" name="is_featured" value="1" id="is_featured"
-                                {{ old('is_featured') ? 'checked' : '' }}
-                                class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
-                            <x-input-label for="is_featured" :value="'Tampilkan sebagai Featured'" class="ml-2" />
-                        </div>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-2">

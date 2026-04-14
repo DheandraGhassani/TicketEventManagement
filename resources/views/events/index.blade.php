@@ -4,7 +4,7 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Daftar Event
             </h2>
-            @if (in_array(auth()->user()->role, ['admin', 'organizer']))
+            @if (auth()->user()->role === 'admin')
                 <a href="{{ route('events.create') }}"
                     class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:bg-indigo-700">
                     + Buat Event
@@ -23,7 +23,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
                         @if ($event->banner_url)
                             <img src="{{ Storage::url($event->banner_url) }}" alt="Banner"
-                                class="w-full h-40 object-cover">
+                                class="w-full h-40 object-contain">
                         @else
                             <div
                                 class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-400 text-sm">
@@ -51,7 +51,7 @@
                                     class="flex-1 text-center bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs py-1.5 rounded hover:bg-indigo-100">
                                     Lihat Detail
                                 </a>
-                                @if (in_array(auth()->user()->role, ['admin', 'organizer']))
+                                @if (auth()->user()->role === 'admin')
                                     <a href="{{ route('events.edit', $event) }}"
                                         class="text-center bg-gray-50 text-gray-700 border border-gray-200 text-xs px-3 py-1.5 rounded hover:bg-gray-100">
                                         Edit
@@ -71,7 +71,7 @@
                 @empty
                     <div class="col-span-3 text-center py-16 text-gray-400">
                         Belum ada event.
-                        @if (in_array(auth()->user()->role, ['admin', 'organizer']))
+                        @if (auth()->user()->role === 'admin')
                             <a href="{{ route('events.create') }}" class="text-indigo-600 underline ml-1">Buat
                                 sekarang</a>
                         @endif

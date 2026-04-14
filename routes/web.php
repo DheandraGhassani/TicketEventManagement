@@ -20,24 +20,28 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ─── Events (bisa diakses semua user, tapi create/edit/delete hanya admin/organizer) ───
-    // Definisikan /events/create SEBELUM /events/{event} agar tidak bentrok routing
-    Route::middleware(['role:admin,organizer'])->group(function () {
+    // ─── Events: hanya Admin yang bisa CUD ───
+    Route::middleware(['role:admin'])->group(function () {
         Route::get('/events/create', [EventController::class, 'create'])->name('events.create');
         Route::post('/events', [EventController::class, 'store'])->name('events.store');
         Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('events.edit');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('events.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('events.destroy');
 
-        // Ticket Types (shallow resource — edit/update/destroy tanpa prefix event)
-        Route::get('/events/{event}/ticket-types', [TicketTypeController::class, 'index'])->name('ticket-types.index');
+        // Ticket Types — CUD hanya admin
         Route::post('/events/{event}/ticket-types', [TicketTypeController::class, 'store'])->name('ticket-types.store');
         Route::get('/ticket-types/{ticketType}/edit', [TicketTypeController::class, 'edit'])->name('ticket-types.edit');
         Route::put('/ticket-types/{ticketType}', [TicketTypeController::class, 'update'])->name('ticket-types.update');
         Route::delete('/ticket-types/{ticketType}', [TicketTypeController::class, 'destroy'])->name('ticket-types.destroy');
 
-        // Categories
+        // Categories — hanya admin
         Route::resource('categories', CategoryController::class);
+    });
+
+    // ─── Admin & Organizer: akses baca + operasional ───
+    Route::middleware(['role:admin,organizer'])->group(function () {
+        // Ticket Types — lihat daftar
+        Route::get('/events/{event}/ticket-types', [TicketTypeController::class, 'index'])->name('ticket-types.index');
 
         // Scan Tiket
         Route::get('/tickets/scan', [ETicketController::class, 'index'])->name('tickets.scan.index');
