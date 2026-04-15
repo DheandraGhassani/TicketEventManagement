@@ -3,14 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -18,15 +17,12 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['name','email','password','role','phone','avatar_url','is_active'];
-
-    public function events() { return $this->hasMany(Event::class, 'users_id'); }
-
-    public function orders() { return $this->hasMany(Order::class); }
-
-    public function eTickets() { return $this->hasMany(ETicket::class); }
-    
-    public function waitingLists() { return $this->hasMany(WaitingList::class); }
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role_id',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.

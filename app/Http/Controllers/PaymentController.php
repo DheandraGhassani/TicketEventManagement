@@ -1,28 +1,48 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Order;
-use App\Models\Payment;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Str;
 
 class PaymentController extends Controller
 {
-    public function simulate(Request $request, Order $order)
+    public function show($id)
     {
-        $payment = Payment::create([
-            'payment_method' => $request->payment_method ?? 'transfer_bank',
-            'transaction_id' => 'TRX-' . strtoupper(Str::random(10)),
-            'paid_at'        => now(),
-        ]);
+        $order = Order::findOrFail($id);
+        return view('payment', compact('order'));
+    }
 
-        $order->update([
-            'status'      => 'paid',
-            'payments_id' => $payment->id,
-        ]);
+    public function pay($id)
+    {
+        $order = Order::findOrFail($id);
 
-        return redirect()->route('orders.success', $order)
-                        ->with('success', '✅ Pembayaran berhasil disimulasikan!');
+        // SIMULASI BERHASIL
+        $order->status = 'paid';
+
+        // generate QR
+        $code = Str::uuid();
+        $qr = QrCode::format('svg')->size(200)->generate(url('/scan/'.$code));
+
+        Storage::disk('public')->put('qr/'.$code.'.svg', $qr);
+
+        $order->qr_code = 'qr/'.$code.'.svg';
+
+        // kurangi stok
+        $order->ticket->decrement('stock');
+
+        $order->save();
+
+        return redirect('/success/'.$order->id);
+    }
+
+    public function fail($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->status = 'failed';
+        $order->save();
+
+        return view('payment_failed', compact('order'));
     }
 }

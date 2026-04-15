@@ -5,47 +5,46 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TicketMail extends Mailable
+class TicketMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    public $order;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($order)
     {
-        //
+        $this->order = $order;
     }
 
     /**
-     * Get the message envelope.
+     * Subject email
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ticket Mail',
+            subject: 'E-Ticket Anda',
         );
     }
 
     /**
-     * Get the message content definition.
+     * View email
      */
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'emails.ticket',
         );
     }
 
     /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
+     * Attachments (optional)
      */
     public function attachments(): array
     {

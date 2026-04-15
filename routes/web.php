@@ -1,40 +1,148 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\TicketTypeController;
-use App\Http\Controllers\ETicketController;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ScanController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminController;
+
+/*
+|--------------------------------------------------------------------------
+| HOME (ROLE BASED)
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
-    return view('welcome');
+
+    if (Auth::check()) {
+        if (Auth::user()->role_id == 1) {
+            return redirect('/admin');
+        }
+    }
+
+    $events = \App\Models\Event::all();
+    return view('home', compact('events'));
 });
 
-Route::middleware(['auth'])->group(function () {
-    // Dashboard Utama
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| EVENT (USER)
+|--------------------------------------------------------------------------
+*/
 
-    // Grouping Admin & Organizer
-    Route::middleware(['role:admin,organizer'])->group(function () {
-        Route::resource('categories', CategoryController::class);
-        Route::resource('events', EventController::class);
-        Route::resource('events.ticket-types', TicketTypeController::class)->shallow();
-        
-        // Route untuk Scan Tiket
-        Route::post('/tickets/scan', [ETicketController::class, 'scan'])->name('tickets.scan');
-    });
-
-    // Grouping User (Pembeli)
-    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-    Route::get('/orders/success/{id}', [OrderController::class, 'success'])->name('orders.success');
-
-    // Profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// detail event → pilih tiket
+Route::get('/event/{id}', function ($id) {
+    $event = \App\Models\Event::with('tickets')->findOrFail($id);
+    return view('event_detail', compact('event'));
 });
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| ADMIN LOGIN (DEV ONLY 🔥)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login-admin', function () {
+    $admin = User::where('role_id', 1)->first();
+    Auth::login($admin);
+    return redirect('/');
+});
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN (SEMUA DALAM GROUP 🔥)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth','role:1'])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | GLOBAL DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/admin', [AdminController::class, 'index']);
+    Route::get('/admin/event/create', [AdminController::class, 'createEvent']);
+    Route::post('/admin/event/store', [AdminController::class, 'storeEvent']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | PER EVENT DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/admin/event/{id}', [AdminController::class, 'eventDashboard']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | TICKET CRUD (PER EVENT SAJA ✅)
+    |--------------------------------------------------------------------------
+    */
+    Route::post('/admin/event/{id}/tickets', [AdminController::class, 'storeTicketByEvent']);
+    Route::post('/admin/tickets/{id}/update', [AdminController::class, 'updateTicket']);
+    Route::post('/admin/tickets/{id}/delete', [AdminController::class, 'deleteTicket']);
+
+    /*
+    |--------------------------------------------------------------------------
+    | WAITING LIST & ORDER
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/admin/waiting-list', [AdminController::class, 'waitingList']);
+    Route::get('/admin/orders/{id}', [AdminController::class, 'orderDetail']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| BUY TICKET (USER)
+|--------------------------------------------------------------------------
+*/
+
+// halaman beli tiket (opsional kalau masih dipakai)
+Route::get('/buy', function () {
+    $tickets = \App\Models\Ticket::all();
+    return view('buy', compact('tickets'));
+});
+
+// submit beli tiket → create order (pending)
+Route::post('/buy', [TicketController::class, 'buy']);
+
+/*
+|--------------------------------------------------------------------------
+| PAYMENT
+|--------------------------------------------------------------------------
+*/
+
+// halaman pembayaran
+Route::get('/payment/{id}', [PaymentController::class, 'show']);
+
+// simulasi bayar
+Route::post('/payment/{id}/pay', [PaymentController::class, 'pay']);
+Route::post('/payment/{id}/fail', [PaymentController::class, 'fail']);
+
+// sukses
+Route::get('/success/{id}', function ($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    return view('success', compact('order'));
+});
+
+/*
+|--------------------------------------------------------------------------
+| QR SCAN
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/scan/{code}', [ScanController::class, 'scan']);
+
+// halaman scanner UI
+Route::get('/scanner', function () {
+    return view('scanner');
+});
+
+/*
+|--------------------------------------------------------------------------
+| AUTH (DEFAULT LARAVEL)
+|--------------------------------------------------------------------------
+*/
+
+require __DIR__.'/auth.php';    
