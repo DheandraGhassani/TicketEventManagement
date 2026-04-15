@@ -59,8 +59,10 @@
                             <span class="text-indigo-200 text-xs">{{ $order->event->title }}</span>
                         </div>
                         <div class="p-5 flex flex-col sm:flex-row gap-5 items-center">
-                            <div class="shrink-0 bg-white p-2 rounded border border-gray-200">
-                                {!! $ticket->qr_code_data !!}
+                            <div class="shrink-0 bg-white p-2 rounded border border-gray-200 text-center">
+                                <div id="qr-{{ $ticket->id }}">
+                                    {!! $ticket->qr_code_data !!}
+                                </div>
                             </div>
                             <div class="text-center sm:text-left">
                                 <p class="text-xs text-gray-500 mb-1">Kode Tiket</p>
@@ -75,6 +77,12 @@
                                     {{ $ticket->status === 'valid' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                                     {{ ucfirst($ticket->status) }}
                                 </span>
+                                <p></p>
+                                <!-- BUTTON DOWNLOAD -->
+                                <button onclick="downloadQR('qr-{{ $ticket->id }}', '{{ $ticket->ticket_code }}')"
+                                    class="mt-2 text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700">
+                                    Download QR
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -95,3 +103,33 @@
         </div>
     </div>
 </x-app-layout>
+<script>
+function downloadQR(id, filename) {
+    const svg = document.getElementById(id).querySelector("svg");
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    const img = new Image();
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        URL.revokeObjectURL(url);
+
+        const png = canvas.toDataURL("image/png");
+
+        const a = document.createElement("a");
+        a.href = png;
+        a.download = filename + ".png";
+        a.click();
+    };
+
+    img.src = url;
+}
+</script>
+

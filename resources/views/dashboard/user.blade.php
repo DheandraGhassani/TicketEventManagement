@@ -64,8 +64,10 @@
                             <p class="text-xs text-gray-500">
                                 {{ $ticket->event->venue_name }}, {{ $ticket->event->city }}
                             </p>
+
                             @if ($ticket->status === 'scanned' && $ticket->scanned_at)
                                 <p class="text-xs text-gray-400 mt-2">
+                                    
                                     Discan: {{ $ticket->scanned_at->format('d M Y, H:i') }}
                                 </p>
                             @endif
